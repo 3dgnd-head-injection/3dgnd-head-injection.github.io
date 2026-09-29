@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct Action-Head Injection of a Grounded 3D Point Unlocks Spatial and Task Generalization</title>
+<meta name="description" content="CoRL 2026 — lifting a 2D grounding point into 3D and injecting it directly into the VLA action head unlocks spatial and task generalization.">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics=""><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,400;0,500;0,600;1,6..72,400&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#faf8f4;font-family:system-ui,sans-serif}
+a{color:oklch(0.5 0.13 250);text-decoration:none}a:hover{color:oklch(0.4 0.14 250)}
+img,video{max-width:100%}
+</style></helmet>
+
+<div style="background:#faf8f4;color:#1b1917;font-family:Newsreader,Georgia,serif;max-width:1120px;margin:0 auto">
+
+  <div style="padding:clamp(40px,6vw,64px) clamp(20px,5vw,84px) 44px;text-align:center">
+    <div style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:oklch(0.5 0.14 30)">CoRL 2026</div>
+    <h1 style="margin: 24px auto 0; max-width: 860px; font: 400 47px/1.14 Newsreader,Georgia,serif; letter-spacing: -.018em; text-wrap: pretty; font-size: clamp(27px,4.4vw,40px)">Direct Action-Head Injection of a Grounded 3D Point Unlocks Spatial and Task Generalization</h1>
+    <p style="margin:28px auto 0;max-width:820px;font:400 17px/1.78 Newsreader,Georgia,serif;color:rgba(27,25,23,.8)">Shiang-Feng Tsai<sup>1</sup> · Jin-Cheng Jhang<sup>1</sup> · Yen-Ling Tai<sup>2</sup> · Jia-Hong Lai<sup>1,*</sup> · Shih-Yun Wong<sup>1,*</sup> · Tung-Hsu Kang<sup>1,*</sup> · Yi-Ting Chen<sup>2</sup> · Min Sun<sup>1</sup></p>
+    <p style="margin:10px 0 0;font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)"><sup>1&nbsp;</sup>National Tsing Hua University  <sup>2&nbsp;</sup>National Yang Ming Chiao Tung University<br><span style="font-size: 11px;">* Equal contribution</span></p>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:32px">
+      <a href="https://arxiv.org/abs/2606.27663" style="padding:11px 20px;border:1px solid rgba(27,25,23,.18);border-radius:999px;font:500 13px/1 'IBM Plex Mono',monospace;color:#1b1917;background:#fff" style-hover="border-color:#1b1917;background:#1b1917;color:#fff">Paper</a>
+      
+      <a href="#" style="padding:11px 20px;border:1px solid rgba(27,25,23,.18);border-radius:999px;font:500 13px/1 'IBM Plex Mono',monospace;color:#1b1917;background:#fff" style-hover="border-color:#1b1917;background:#1b1917;color:#fff">Code <span style="color:rgba(27,25,23,.45)">(Coming Soon)</span></a>
+    </div>
+  </div>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Abstract</h2>
+      
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;margin-top:22px">
+      <p style="margin: 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; text-align: justify; width: 100%">Vision-Language-Action (VLA) models leverage large-scale vision-language pretraining for flexible robot manipulation, yet at test time they remain brittle to changed object positions and to familiar scenes paired with different instructions. A growing family of methods addresses this brittleness by supplying the policy with grounding signals, such as 2D pixel coordinates for object localization and placement.</p>
+      <p style="margin: 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; text-align: justify; width: 100%">However, we find that <span style="color:oklch(0.45 0.13 250)">how the grounding signal is represented and injected matters more than the signal itself</span>. In this work, we propose a lightweight module that represents the grounding signal in 3D and injects the resulting embedding directly into the action head. The module is a two-layer MLP and requires no changes to the VLA backbone or pretraining pipeline, yet it yields substantially larger gains than language- or visual-prompting alternatives.</p>
+      <p style="margin: 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; text-align: justify; width: 100%">On LIBERO-PRO, our method improves the average success rate of GR00T-N1.6 from 31.2 to 77.5 under task perturbation and from 28.1 to 60.2 under position perturbation. Comparable gains are also achieved for π<sub>0.5</sub>, demonstrating that the mechanism is backbone-agnostic across VLAs with diffusion-based action heads. We further validate the practical applicability with real-world experiments. Together, these results support our central finding: lifting adequate 2D grounding into 3D and injecting it into the action head enables spatial and instance-level task generalization in VLAs.</p>
+    </div>
+  </div>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Method</h2>
+      
+    </div>
+    <p style="margin:22px 0 0;font:400 17px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.82);text-wrap:pretty">Our method makes two decisions about one grounding point: <span style="color: oklch(0.45 0.13 250); font-weight: 500;">represent it in 3D</span>, and <span style="color: oklch(0.45 0.13 250); font-weight: 500;">inject it directly into the action head</span>.&nbsp;</p>
+    <figure style="margin:26px 0 0">
+      <div style="display:grid;grid-template-columns:0.4707fr 1.1169fr 0.7166fr;gap:clamp(6px,1vw,14px);align-items:stretch;padding:clamp(8px,1.4vw,16px);background:#fff;border:1px solid rgba(27,25,23,.12)">
+        <div onClick="{{ goto0 }}" style="position:relative;cursor:pointer;min-width:0">
+<sc-if value="{{ a0 }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-7px;border:1.5px solid oklch(0.5 0.13 250);border-radius:14px;box-shadow:0 0 0 4px oklch(0.5 0.13 250 / 0.09);pointer-events:none"></div></sc-if>
+          <img src="assets/fig_panel1.png" alt="Panel 1 — 2D grounding: the instruction and observation go to an off-the-shelf grounding module, which returns the pixel bowl [0.51, 0.63]." style="width:100%;height:auto;display:block">
+        </div>
+        <div onClick="{{ goto1 }}" style="position:relative;cursor:pointer;min-width:0">
+<sc-if value="{{ a1 }}"><div style="position:absolute;inset:-7px;border:1.5px solid oklch(0.5 0.13 250);border-radius:14px;box-shadow:0 0 0 4px oklch(0.5 0.13 250 / 0.09);pointer-events:none"></div></sc-if>
+          <img src="assets/fig_panel2.png" alt="Panel 2 — obtain spatial embedding: lift the pixel to 3D with depth and camera parameters, then encode the gripper-to-target displacement with an MLP." style="width:100%;height:auto;display:block">
+        </div>
+        <div onClick="{{ goto2 }}" style="position:relative;cursor:pointer;min-width:0">
+<sc-if value="{{ a2 }}"><div style="position:absolute;inset:-7px;border:1.5px solid oklch(0.5 0.13 250);border-radius:14px;box-shadow:0 0 0 4px oklch(0.5 0.13 250 / 0.09);pointer-events:none"></div></sc-if>
+          <img src="assets/fig_panel3.png" alt="Panel 3 — spatial-conditioned policy: the spatial embedding conditions the flow-matching action head via AdaLN, producing the predicted action chunk." style="width:100%;height:auto;display:block">
+        </div>
+      </div>
+      <figcaption style="margin-top:14px;font:400 13.5px/1.65 Newsreader,Georgia,serif;color:rgba(27,25,23,.72)"><span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(27, 25, 23, 0.72);">Figure 2 &nbsp;</span>The grounded pixel is lifted with depth and camera parameters, reduced to a gripper-relative displacement, encoded by a two-layer MLP, and injected into the action head through AdaLN.&nbsp;</figcaption>
+    </figure>
+    <div style="margin-top:26px;min-height:118px">
+      <sc-if value="{{ a0 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:oklch(0.5 0.13 250)">01</span><span style="font:500 19px/1.25 Newsreader,serif">2D grounding</span></div>
+        <p style="margin:10px 0 0;font:400 17px/1.68 Newsreader,Georgia,serif;color:rgba(27,25,23,.76);text-wrap:pretty;max-width:none">The instruction names a target; a grounding module returns one 2D point for the current sub-goal. Nothing in this stage is ours — a detector, a segmentation mask, or a VLM all work.</p>
+        <p style="margin:10px 0 0;font:500 12.5px/1.7 'IBM Plex Mono',monospace;color:oklch(0.45 0.13 250)">"Pick up the bowl." → bowl @ [0.51, 0.63]</p>
+      </sc-if>
+      <sc-if value="{{ a1 }}">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:oklch(0.5 0.13 250)">02</span><span style="font:500 19px/1.25 Newsreader,serif">3D spatial embedding</span></div>
+        <p style="margin:10px 0 0;font:400 17px/1.68 Newsreader,Georgia,serif;color:rgba(27,25,23,.76);text-wrap:pretty;max-width:none">Depth and camera parameters lift that pixel into the robot base frame, so the signal lives in the same space the action head predicts in. We keep only the gripper-to-target displacement and encode it with a two-layer MLP.</p>
+        <p style="margin:10px 0 0;font:500 12.5px/1.7 'IBM Plex Mono',monospace;color:oklch(0.45 0.13 250)">d = p<sub>t</sub> − p<sub>g</sub> &nbsp;→&nbsp; z<sub>spatial</sub> = MLP(d)</p>
+      </sc-if>
+      <sc-if value="{{ a2 }}">
+        <div style="display:flex;align-items:baseline;gap:10px"><span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:oklch(0.5 0.13 250)">03</span><span style="font:500 19px/1.25 Newsreader,serif">Inject spatial embedding into the VLA</span></div>
+        <p style="margin:10px 0 0;font:400 17px/1.68 Newsreader,Georgia,serif;color:rgba(27,25,23,.76);text-wrap:pretty;max-width:none">In the DiT action head, AdaLN normally conditions each block on the timestep alone. We add the spatial embedding to the timestep embedding, so the denoising process is also conditioned on the grounding signal.&nbsp;</p>
+        <p style="margin:10px 0 0;font:500 12.5px/1.7 'IBM Plex Mono',monospace;color:oklch(0.45 0.13 250)">γ, β = Linear(z<sub>time</sub> + z<sub>spatial</sub>)</p>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em"><span style="letter-spacing: -0.012em;">LIBERO &amp; LIBERO-PRO</span><br></h2>
+      
+    </div>
+    <p style="margin:22px 0 0;font:400 17px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.82);text-wrap:pretty">We fine-tune two backbones, π<sub>0.5</sub> and GR00T-N1.6, on the same 69 pick-and-place tasks (LIBERO-Object, LIBERO-Spatial and 49 tasks from LIBERO-90), once as-is and once with our module. Every model is then tested under three conditions:</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px;margin-top:18px">
+      <div style="padding:16px 18px;background:#f2efe8;border-left:2px solid rgba(27,25,23,.3)">
+        <div style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.6)">In distribution</div>
+        <div style="margin-top:10px;font:500 16px/1.4 Newsreader,Georgia,serif;color:#1b1917">Same layout · same instruction</div>
+        <p style="margin:6px 0 0;font:400 15px/1.62 Newsreader,Georgia,serif;color:rgba(27,25,23,.78);text-wrap:pretty">The original LIBERO test: scenes and instructions as seen in training.</p>
+      </div>
+      <div style="padding:16px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.14 30)">
+        <div style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30)">Task perturbation</div>
+        <div style="margin-top:10px;font:500 16px/1.4 Newsreader,Georgia,serif;color:#1b1917">Same layout · new instruction</div>
+        <p style="margin:6px 0 0;font:400 15px/1.62 Newsreader,Georgia,serif;color:rgba(27,25,23,.78);text-wrap:pretty">The target is swapped for another object already in the scene.&nbsp;</p>
+      </div>
+      <div style="padding:16px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.14 30)">
+        <div style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30)">Position perturbation</div>
+        <div style="margin-top:10px;font:500 16px/1.4 Newsreader,Georgia,serif;color:#1b1917">Same instruction · new layout</div>
+        <p style="margin:6px 0 0;font:400 15px/1.62 Newsreader,Georgia,serif;color:rgba(27,25,23,.78);text-wrap:pretty">Objects start at different positions.&nbsp;</p>
+      </div>
+    </div>
+    <div style="margin-top:26px;overflow-x:auto"><table style="width:100%;min-width:760px;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace">
+      <thead>
+        <tr>
+          <th style="width:25%;padding:0 8px 10px 0"></th>
+          <th colspan="3" style="width:25%;text-align:center;padding:0 8px 10px;font:600 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:rgba(27,25,23,.7);border-left:1px solid rgba(27,25,23,.1)">LIBERO</th>
+          <th colspan="6" style="width:50%;text-align:center;padding:0 8px 10px;font:600 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;color:rgba(27,25,23,.7);border-left:1px solid rgba(27,25,23,.1)">LIBERO-PRO</th>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.2)">
+          <th style="width:25%;text-align:left;padding:0 8px 8px 0;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.48)">Method</th>
+          <th colspan="3" style="width:25%;text-align:center;padding:0 8px 8px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.48);border-left:1px solid rgba(27,25,23,.1)">IN DISTRIBUTION</th>
+          <th colspan="3" style="width:25%;text-align:center;padding:0 8px 8px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Task perturbation</th>
+          <th colspan="3" style="width:25%;text-align:center;padding:0 8px 8px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Position perturbation</th>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.2)">
+          <th style="padding:6px 8px 8px 0"></th>
+          <th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45);border-left:1px solid rgba(27,25,23,.1)">Object</th><th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45)">Spatial</th><th style="text-align:center;padding:6px 8px 8px;font:500 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.7)">Avg</th>
+          <th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45);border-left:1px solid rgba(27,25,23,.1)">Object</th><th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45)">Spatial</th><th style="text-align:center;padding:6px 8px 8px;font:500 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.7)">Avg</th>
+          <th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45);border-left:1px solid rgba(27,25,23,.1)">Object</th><th style="text-align:center;padding:6px 8px 8px;font:400 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.45)">Spatial</th><th style="text-align:center;padding:6px 8px 8px;font:500 10.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.7)">Avg</th>
+        </tr>
+      </thead>
+      <tbody style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">
+        <tr><td colspan="10" style="padding:16px 0 6px;font:500 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Reference open-source VLAs</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">OpenVLA</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">88.4</td><td style="text-align:center;padding:9px 8px">84.7</td><td style="text-align:center;padding:9px 8px">86.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">1.8</td><td style="text-align:center;padding:9px 8px">46.4</td><td style="text-align:center;padding:9px 8px">24.1</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">0.0</td><td style="text-align:center;padding:9px 8px">0.0</td><td style="text-align:center;padding:9px 8px">0.0</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0</sub></td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">98.8</td><td style="text-align:center;padding:9px 8px">96.8</td><td style="text-align:center;padding:9px 8px">97.8</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">10.0</td><td style="text-align:center;padding:9px 8px">54.4</td><td style="text-align:center;padding:9px 8px">32.2</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">0.2</td><td style="text-align:center;padding:9px 8px">11.6</td><td style="text-align:center;padding:9px 8px">5.9</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">MolmoAct</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">95.4</td><td style="text-align:center;padding:9px 8px">87.0</td><td style="text-align:center;padding:9px 8px">91.2</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">9.2</td><td style="text-align:center;padding:9px 8px">31.6</td><td style="text-align:center;padding:9px 8px">20.4</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">4.2</td><td style="text-align:center;padding:9px 8px">0.2</td><td style="text-align:center;padding:9px 8px">2.2</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">FALCON<sup>*</sup></td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">98.8</td><td style="text-align:center;padding:9px 8px">97.6</td><td style="text-align:center;padding:9px 8px">98.2</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px">48.2</td><td style="text-align:center;padding:9px 8px">26.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">0.6</td><td style="text-align:center;padding:9px 8px">12.2</td><td style="text-align:center;padding:9px 8px">6.4</td>
+        </tr>
+        <tr><td colspan="10" style="padding:16px 0 6px;font:500 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled pairs — same backbone and data, with vs. without our module</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub></td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">94.8</td><td style="text-align:center;padding:9px 8px">96.0</td><td style="text-align:center;padding:9px 8px">95.4</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">20.0</td><td style="text-align:center;padding:9px 8px">54.6</td><td style="text-align:center;padding:9px 8px">37.3</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">36.0</td><td style="text-align:center;padding:9px 8px">58.0</td><td style="text-align:center;padding:9px 8px">47.0</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub> + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">97.0</td><td style="text-align:center;padding:9px 8px">98.2</td><td style="text-align:center;padding:9px 8px">97.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">70.6</td><td style="text-align:center;padding:9px 8px">81.2</td><td style="text-align:center;padding:9px 8px;color:oklch(0.42 0.13 250)">75.9</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">75.0</td><td style="text-align:center;padding:9px 8px">69.4</td><td style="text-align:center;padding:9px 8px;color:oklch(0.42 0.13 250)">72.2</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:4px 8px 9px 0;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">Δ vs. baseline</td>
+          <td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+2.2</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+2.2</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+2.2</td><td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+50.6</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+26.6</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+38.6</td><td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+39.0</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+11.4</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+25.2</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">93.8</td><td style="text-align:center;padding:9px 8px">93.2</td><td style="text-align:center;padding:9px 8px">93.5</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">10.0</td><td style="text-align:center;padding:9px 8px">52.4</td><td style="text-align:center;padding:9px 8px">31.2</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">29.2</td><td style="text-align:center;padding:9px 8px">27.0</td><td style="text-align:center;padding:9px 8px">28.1</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6 + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">99.6</td><td style="text-align:center;padding:9px 8px">92.4</td><td style="text-align:center;padding:9px 8px">96.0</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">70.4</td><td style="text-align:center;padding:9px 8px">84.6</td><td style="text-align:center;padding:9px 8px;color:oklch(0.42 0.13 250)">77.5</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">79.4</td><td style="text-align:center;padding:9px 8px">41.0</td><td style="text-align:center;padding:9px 8px;color:oklch(0.42 0.13 250)">60.2</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:4px 8px 9px 0;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">Δ vs. baseline</td>
+          <td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+5.8</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:rgba(27,25,23,.5)">−0.8</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+2.5</td><td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+60.4</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+32.2</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+46.3</td><td style="text-align:center;padding:4px 8px 9px;border-left:1px solid rgba(27,25,23,.1);font-size:11.5px;color:oklch(0.45 0.13 250)">+50.2</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+14.0</td><td style="text-align:center;padding:4px 8px 9px;font-size:11.5px;color:oklch(0.45 0.13 250)">+32.1</td>
+        </tr>
+      </tbody>
+    </table></div>
+    <p style="margin:10px 0 0;font:400 11.5px/1.7 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)"><sup>*</sup>Reproduced by us with the same 69-task training data.</p>
+    <ul style="margin:18px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty">
+      <li style="font-size: 16px">Every baseline collapses under perturbation, while our module substantially improves both backbones.</li>
+      <li style="font-size: 16px">The gain is not just from adding 3D: FALCON also feeds 3D features into the action head, yet still fails under position perturbation (6.4). What makes the difference is a 3D signal tied to the instructed target.</li>
+    </ul>
+  </div>
+
+  <sc-if value="{{ showControlled }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:clamp(32px,4.5vw,52px) clamp(20px,5vw,84px) 0">
+    <div style="border:1px solid rgba(27,25,23,.14);background:#fff;padding:clamp(20px,3vw,30px) clamp(18px,3vw,34px)">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <h3 style="margin:0;font:400 21px/1.2 Newsreader,serif">Controlled comparison of representation and injection</h3>
+        
+      </div>
+      <p style="margin:12px 0 0;font:400 15.5px/1.68 Newsreader,Georgia,serif;color:rgba(27,25,23,.76);text-wrap:pretty">Same 2D target point for every variant; only its representation and injection methods differ.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:36px;margin-top:24px">
+        <div>
+          <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.42);margin-bottom:14px">Task perturbation</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">Baseline</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:31.2%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">31.2</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Text Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:42.5%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">42.5</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Visual Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:40.3%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">40.3</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · AdaLN</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:47.7%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">47.7</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">3D · Text Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:38.5%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">38.5</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:500 11.5px/1.3 'IBM Plex Mono',monospace;color:#1b1917">3D · AdaLN (ours)</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:77.5%;height:100%;background:oklch(0.5 0.13 250)"></div></div><div style="width:36px;text-align:right;font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">77.5</div></div>
+          </div>
+        </div>
+        <div>
+          <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.42);margin-bottom:14px">Position perturbation</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">Baseline</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:28.1%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">28.1</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Text Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:31.7%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">31.7</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Visual Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:30.4%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">30.4</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · AdaLN</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:37.8%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">37.8</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">3D · Text Prompt</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:39.4%;height:100%;background:rgba(27,25,23,.25)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace">39.4</div></div>
+            <div style="display:flex;align-items:center;gap:10px"><div style="width:126px;font:500 11.5px/1.3 'IBM Plex Mono',monospace;color:#1b1917">3D · AdaLN (ours)</div><div style="flex:1;height:12px;background:#f0ede6"><div style="width:60.2%;height:100%;background:oklch(0.5 0.13 250)"></div></div><div style="width:36px;text-align:right;font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">60.2</div></div>
+          </div>
+        </div>
+      </div>
+      <p style="margin:22px 0 0;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty"><span style="color: rgb(27, 25, 23); font-weight: 500;">Both choices are needed.</span> A 2D point stays limited however it is injected, even through the same AdaLN pathway as ours. A 3D point written into the text prompt barely helps either. Only 3D with direct injection delivers the large gain.</p>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{ showScaling }}" hint-placeholder-val="{{ true }}">
+  <div style="padding:clamp(24px,3.5vw,36px) clamp(20px,5vw,84px) 0">
+    <div style="border:1px solid rgba(27,25,23,.16);background:#fff;padding:clamp(20px,3vw,30px) clamp(18px,3vw,34px)">
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <h3 style="margin:0;font:400 21px/1.2 Newsreader,serif">Design choices outweigh data scaling</h3>
+        
+      </div>
+      <p style="margin:12px 0 0;font:400 15.5px/1.68 Newsreader,Georgia,serif;color:rgba(27,25,23,.76);text-wrap:pretty">Every method retrained on only the 20 original tasks (LIBERO-Object + LIBERO-Spatial), compared with 69.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:18px;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">
+        <span style="display:flex;align-items:center;gap:7px"><span style="width:16px;height:9px;background:rgba(27,25,23,.12);display:block"></span>20 tasks</span>
+        <span style="display:flex;align-items:center;gap:7px"><span style="width:16px;height:9px;background:rgba(27,25,23,.25);display:block"></span>69 tasks</span>
+        <span style="display:flex;align-items:center;gap:7px"><span style="width:0;height:11px;border-left:1px dashed rgba(27,25,23,.45);display:block"></span>ours @ 20 tasks</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:36px;margin-top:22px">
+      <div>
+        <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:oklch(0.5 0.14 30);margin-bottom:14px">Task perturbation</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">Baseline</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:28.9%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">28.9</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:31.2%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">31.2</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Text Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:32.1%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">32.1</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:42.5%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">42.5</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Visual Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:29.6%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">29.6</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:40.3%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">40.3</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · AdaLN</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:39.6%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">39.6</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:47.7%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">47.7</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">3D · Text Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:32.9%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">32.9</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:38.5%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">38.5</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:500 11.5px/1.3 'IBM Plex Mono',monospace;color:#1b1917">3D · AdaLN (ours)</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:62%;height:100%;background:oklch(0.72 0.07 250)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">62.0</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:77.5%;height:100%;background:oklch(0.5 0.13 250)"></div><div style="position:absolute;left:62%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">77.5</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:oklch(0.5 0.14 30);margin-bottom:14px">Position perturbation</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">Baseline</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:3.4%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">3.4</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:28.1%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">28.1</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Text Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:15.3%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">15.3</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:31.7%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">31.7</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · Visual Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:1.7%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">1.7</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:30.4%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">30.4</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">2D · AdaLN</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:19.4%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">19.4</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:37.8%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">37.8</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:400 11.5px/1.3 'IBM Plex Mono',monospace;color:rgba(27,25,23,.58)">3D · Text Prompt</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:5.4%;height:100%;background:rgba(27,25,23,.12)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">5.4</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:39.4%;height:100%;background:rgba(27,25,23,.25)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">39.4</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:132px;font:500 11.5px/1.3 'IBM Plex Mono',monospace;color:#1b1917">3D · AdaLN (ours)</div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:41.5%;height:100%;background:oklch(0.72 0.07 250)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:400 11px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.5)">41.5</div></div>
+              <div style="display:flex;align-items:center;gap:10px"><div style="position:relative;flex:1;height:11px;background:#f0ede6"><div style="width:60.2%;height:100%;background:oklch(0.5 0.13 250)"></div><div style="position:absolute;left:41.5%;top:-2px;bottom:-2px;width:0;border-left:1px dashed rgba(27,25,23,.45)"></div></div><div style="width:36px;text-align:right;font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">60.2</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <p style="margin:22px 0 0;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty"><span style="color: rgb(27, 25, 23); font-weight: 500;">A better design beats more data.</span> More training tasks help every method, so data diversity does matter. Still, ours trained on just 20 tasks&nbsp;&nbsp;(dashed line) outperforms every other method trained on 69.</p>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Rollouts in simulation</h2>
+      
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:22px 0 16px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Suite</span>
+        <button onClick="{{ pickObj }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">LIBERO-Object<sc-if value="{{ isObj }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickSpa }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">LIBERO-Spatial<sc-if value="{{ isSpa }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Condition</span>
+        <button onClick="{{ pickId }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">In distribution<sc-if value="{{ isId }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickTask }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Task perturbation<sc-if value="{{ isTask }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickPos }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Position perturbation<sc-if value="{{ isPos }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <button onClick="{{ restart }}" style="cursor:pointer;background:transparent;border:1px solid rgba(27,25,23,.14);padding:8px 13px;font:400 11.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">↻ replay</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;margin-bottom:14px;padding:13px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.13 250)">
+      <span style="flex:none;font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.45)">Instruction</span>
+      <sc-if value="{{ sc_object_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the tomato sauce and place it in the basket.”</span></sc-if>
+      <sc-if value="{{ sc_object_id }}" hint-placeholder-val="{{ true }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the salad dressing and place it in the basket.”</span></sc-if>
+      <sc-if value="{{ sc_object_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the salad dressing and place it in the basket.”</span></sc-if>
+      <sc-if value="{{ sc_spatial_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick the akita black bowl from table center and place it on the plate.”</span></sc-if>
+      <sc-if value="{{ sc_spatial_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick the akita black bowl next to the plate and place it on the plate.”</span></sc-if>
+      <sc-if value="{{ sc_spatial_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick the akita black bowl from table center and place it on the plate.”</span></sc-if>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
+      <div style="border:1px solid rgba(27,25,23,.14);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.6)">GR00T-N1.6</span>
+          
+        </div>
+        <video ref="{{ refBase }}" src="{{ baseSrc }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+      <div style="border:1.5px solid oklch(0.5 0.13 250 / 0.5);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">GR00T-N1.6 + Ours</span>
+          
+        </div>
+        <video ref="{{ refOurs }}" src="{{ oursSrc }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+    </div>
+    <p style="margin: 16px 0 0; font: 400 15.5px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.6); text-align: justify">Both panes always show the same two models: GR00T-N1.6 fine-tuned as-is, and with our module. Both succeed in distribution. Under task perturbation, the baseline ignores the new target and repeats the motion it memorized for this scene; under position perturbation, it reaches for where the target used to be. With our module, the policy follows the instruction and finds the moved object.</p>
+
+  </div>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Real-world experiments</h2>
+      
+    </div>
+    <p style="margin: 22px 0 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; font-size: 16px">In our real-world experiments, the 2D point comes from an off-the-shelf VLM (Qwen3-VL-4B) and depth from a consumer RGB-D camera (Intel RealSense D435); both are far noisier than the ground-truth signals available in simulation.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:22px 0 16px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Scene</span>
+        <button onClick="{{ pickT4 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Lemon → bowl<sc-if value="{{ isT4 }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickT6 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Orange → green bowl<sc-if value="{{ isT6 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickT2 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Red cube → bowl<sc-if value="{{ isT2 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Condition</span>
+        <button onClick="{{ pickRId }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">In distribution<sc-if value="{{ isRId }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickRTask }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Task perturbation<sc-if value="{{ isRTask }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickRPos }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Position perturbation<sc-if value="{{ isRPos }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <button onClick="{{ restartR }}" style="cursor:pointer;background:transparent;border:1px solid rgba(27,25,23,.14);padding:8px 13px;font:400 11.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">↻ replay</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;margin-bottom:14px;padding:13px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.13 250)">
+      <span style="flex:none;font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.45)">Instruction</span>
+      <sc-if value="{{ rc_t2_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t2_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the blue cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t2_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t4_id }}" hint-placeholder-val="{{ true }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t4_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it on the plate.”</span></sc-if>
+      <sc-if value="{{ rc_t4_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the pink bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
+      <div style="border:1px solid rgba(27,25,23,.14);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.6)">GR00T-N1.6</span>
+          
+        </div>
+        <video ref="{{ refBaseR }}" src="{{ baseSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+      <div style="border:1.5px solid oklch(0.5 0.13 250 / 0.5);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">GR00T-N1.6 + Ours</span>
+          
+        </div>
+        <video ref="{{ refOursR }}" src="{{ oursSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+    </div>
+    <div style="margin-top:30px;overflow-x:auto"><table style="width:100%;min-width:560px;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.2)">
+          <th style="width:37%;text-align:left;padding:0 8px 9px 0;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55)">Method</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55);border-left:1px solid rgba(27,25,23,.1)">In distribution</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Task perturbation</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Position perturbation</th>
+        </tr>
+      </thead>
+      <tbody style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">
+        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled pairs — with vs. without our module</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub></td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">85.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">32.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">27.5</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub> + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">91.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">78.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">61.3</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">68.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6 + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">92.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">63.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">66.3</td>
+        </tr>
+        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled comparison of representation and injection — GR00T-N1.6</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Text Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">7.5</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Visual Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">88.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">6.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via AdaLN</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">18.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">16.3</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 3D via Text Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">86.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
+        </tr>
+      </tbody>
+    </table></div>
+    
+    <ul style="margin:18px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty">
+      <li style="font-size: 16px">The simulation findings hold on a real robot, despite noisier grounding and depth.</li>
+      <li style="font-size: 16px">Both backbones collapse under perturbation and our module restores most of the performance.</li>
+      <li style="font-size: 16px">Every grounding variant helps in distribution, but only ours holds up under perturbation.&nbsp;</li>
+    </ul>
+  </div>
+
+
+  <div style="padding:clamp(38px,5vw,56px) clamp(20px,5vw,84px) 60px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">BibTeX</h2>
+      <button onClick="{{ copy }}" style="cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.18);padding:9px 15px;font:500 11.5px/1 'IBM Plex Mono',monospace;color:#1b1917">copy<sc-if value="{{ copied }}"><span style="margin-left:8px;color:oklch(0.42 0.13 250)">✓</span></sc-if></button>
+    </div>
+    <pre ref="{{ refBib }}" style="margin:20px 0 0;padding:22px 24px;background:#f2efe8;overflow-x:auto;font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">@inproceedings{
+  tsai2026direct,
+  title={Direct Action-Head Injection of A Grounded 3D Point Unlocks Spatial and Task Generalization},
+  author={Tsai, Shiang-Feng and Jhang, Jin-Cheng and Tai, Yen-Ling and Lai, Jia-Hong and Wong, Shih-Yun and Kang, Tung-Hsu and Chen, Yi-Ting and Sun, Min},
+  booktitle={10th Annual Conference on Robot Learning},
+  year={2026},
+}</pre>
+  </div>
+
+</div>
+
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showTeaser&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showControlled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showScaling&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;autoPipeline&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Method&quot;}}">
+class Component extends DCLogic {
+  state = { suite: 'object', cond: 'id', pairB: 'object_task', taskR: 't4', condR: 'id', step: 0, held: false, copied: false };
+  refBase = React.createRef();
+  refOurs = React.createRef();
+  refBaseB = React.createRef();
+  refOursB = React.createRef();
+  refBaseR = React.createRef();
+  refOursR = React.createRef();
+  refBib = React.createRef();
+
+  armVideos = () => {
+    const root = this.refBase && this.refBase.current && this.refBase.current.ownerDocument;
+    if (!root) return;
+    root.querySelectorAll('video').forEach(v => { v.muted = true; v.defaultMuted = true; v.loop = true; });
+  };
+
+  componentDidMount() {
+    this.armVideos();
+    this.videoTick = setInterval(this.armVideos, 1200);
+    this.timer = setInterval(() => {
+      if (this.props.autoPipeline === false || this.state.held) return;
+      this.setState(s => ({ step: (s.step + 1) % 3 }));
+    }, 2900);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.videoTick); }
+
+  src(pfx, suite, cond) { return 'assets/' + pfx + '_' + suite + '_' + cond + '.mp4'; }
+
+  kick(refs) {
+    refs.forEach(r => {
+      const v = r && r.current;
+      if (!v) return;
+      v.muted = true; v.defaultMuted = true; v.loop = true;
+      try { v.load(); const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    });
+  }
+
+  hoverPlay = e => {
+    const v = e.currentTarget.querySelector('video');
+    if (!v) return;
+    v.muted = true; v.loop = true;
+    try { v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch (err) {}
+  };
+  hoverStop = e => {
+    const v = e.currentTarget.querySelector('video');
+    if (v) { try { v.pause(); v.currentTime = 0; } catch (err) {} }
+  };
+
+  copyBib = () => {
+    const el = this.refBib.current;
+    const bib = el ? el.textContent.trim() : '';
+    try { navigator.clipboard.writeText(bib); } catch (e) {}
+    this.setState({ copied: true });
+    clearTimeout(this.ct);
+    this.ct = setTimeout(() => this.setState({ copied: false }), 1800);
+  };
+
+  renderVals() {
+    const s = this.state, P = this.props;
+    const hover = P.hoverToPlay !== false;
+    const [suB, coB] = s.pairB.split('_');
+
+    const kickR = () => this.kick([this.refBaseR, this.refOursR]);
+    const out = {
+      refBaseR: this.refBaseR, refOursR: this.refOursR,
+      baseSrcR: 'assets/rbase_' + s.taskR + '_' + s.condR + '.mp4',
+      oursSrcR: 'assets/rours_' + s.taskR + '_' + s.condR + '.mp4',
+      isT2: s.taskR === 't2', isT4: s.taskR === 't4', isT6: s.taskR === 't6',
+      isRId: s.condR === 'id', isRTask: s.condR === 'task', isRPos: s.condR === 'pos',
+      pickT2: () => this.setState({ taskR: 't2' }, kickR),
+      pickT4: () => this.setState({ taskR: 't4' }, kickR),
+      pickT6: () => this.setState({ taskR: 't6' }, kickR),
+      pickRId: () => this.setState({ condR: 'id' }, kickR),
+      pickRTask: () => this.setState({ condR: 'task' }, kickR),
+      pickRPos: () => this.setState({ condR: 'pos' }, kickR),
+      restartR: kickR,
+      showTeaser: P.showTeaser !== false,
+      showControlled: P.showControlled !== false,
+      showScaling: P.showScaling !== false,
+      gridAuto: !hover,
+      onEnter: hover ? this.hoverPlay : null,
+      onLeave: hover ? this.hoverStop : null,
+      refBase: this.refBase, refOurs: this.refOurs,
+      refBaseB: this.refBaseB, refOursB: this.refOursB,
+      baseSrc: this.src('base', s.suite, s.cond),
+      oursSrc: this.src('ours', s.suite, s.cond),
+      baseSrcB: this.src('base', suB, coB),
+      oursSrcB: this.src('ours', suB, coB),
+      isObj: s.suite === 'object', isSpa: s.suite === 'spatial',
+      isId: s.cond === 'id', isTask: s.cond === 'task', isPos: s.cond === 'pos',
+      a0: s.step === 0, a1: s.step === 1, a2: s.step === 2,
+      copied: s.copied, copy: this.copyBib,
+      restart: () => this.kick([this.refBase, this.refOurs]),
+      restartB: () => this.kick([this.refBaseB, this.refOursB]),
+      pickObj: () => this.setState({ suite: 'object' }, () => this.kick([this.refBase, this.refOurs])),
+      pickSpa: () => this.setState({ suite: 'spatial' }, () => this.kick([this.refBase, this.refOurs])),
+      pickId: () => this.setState({ cond: 'id' }, () => this.kick([this.refBase, this.refOurs])),
+      pickTask: () => this.setState({ cond: 'task' }, () => this.kick([this.refBase, this.refOurs])),
+      pickPos: () => this.setState({ cond: 'pos' }, () => this.kick([this.refBase, this.refOurs]))
+    };
+    [0, 1, 2].forEach(i => { out['goto' + i] = () => this.setState({ step: i, held: true }); });
+    out.refBib = this.refBib;
+    ['object', 'spatial'].forEach(su => ['id', 'task', 'pos'].forEach(c => {
+      out['sc_' + su + '_' + c] = s.suite === su && s.cond === c;
+    }));
+    ['t2', 't4', 't6'].forEach(t => ['id', 'task', 'pos'].forEach(c => {
+      out['rc_' + t + '_' + c] = s.taskR === t && s.condR === c;
+    }));
+    ['object', 'spatial'].forEach(su => ['id', 'task', 'pos'].forEach(c => {
+      const key = su + '_' + c;
+      out['pb_' + key] = () => this.setState({ pairB: key }, () => this.kick([this.refBaseB, this.refOursB]));
+      out['ab_' + key] = s.pairB === key;
+    }));
+    return out;
+  }
+}
+</script>
+</body>
+</html>
