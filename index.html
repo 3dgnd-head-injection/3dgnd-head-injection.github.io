@@ -87,7 +87,111 @@ img,video{max-width:100%}
 
   <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
     <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
-      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em"><span style="letter-spacing: -0.012em;">LIBERO &amp; LIBERO-PRO</span><br></h2>
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Real-world experiments</h2>
+      
+    </div>
+    <p style="margin: 22px 0 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; font-size: 16px">In our real-world experiments, the 2D point comes from an off-the-shelf VLM (Qwen3-VL-4B) and depth from a consumer RGB-D camera (Intel RealSense D435).</p>
+    <div style="margin-top:22px;overflow-x:auto"><table style="width:100%;min-width:560px;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.2)">
+          <th style="width:37%;text-align:left;padding:0 8px 9px 0;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55)">Method</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55);border-left:1px solid rgba(27,25,23,.1)">In distribution</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Task perturbation</th>
+          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Position perturbation</th>
+        </tr>
+      </thead>
+      <tbody style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">
+        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled pairs — with vs. without our module</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub></td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">85.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">32.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">27.5</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub> + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">91.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">78.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">61.3</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">68.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
+          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6 + Ours</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">92.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">63.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">66.3</td>
+        </tr>
+        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled comparison of representation and injection — GR00T-N1.6</td></tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Text Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">7.5</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Visual Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">88.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">6.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via AdaLN</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">18.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">16.3</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
+          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 3D via Text Prompt</td>
+          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">86.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
+        </tr>
+      </tbody>
+    </table></div>
+    
+    <ul style="margin:18px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty">
+      <li style="font-size: 16px">Our module holds up on a real robot, despite noisier grounding and depth.</li>
+      <li style="font-size: 16px">Both backbones collapse under perturbation and our module restores most of the performance.</li>
+      <li style="font-size: 16px">Every grounding variant helps in distribution, but only ours holds up under perturbation.&nbsp;</li>
+    </ul>
+    <h3 style="margin:40px 0 0;font:400 clamp(19px,2.1vw,22px)/1.25 Newsreader,serif;letter-spacing:-.01em">Rollouts in real world</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:18px 0 16px">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Scene</span>
+        <button onClick="{{ pickT4 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Lemon → bowl<sc-if value="{{ isT4 }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickT6 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Orange → green bowl<sc-if value="{{ isT6 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickT2 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Red cube → bowl<sc-if value="{{ isT2 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Condition</span>
+        <button onClick="{{ pickRId }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">In distribution<sc-if value="{{ isRId }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickRTask }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Task perturbation<sc-if value="{{ isRTask }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+        <button onClick="{{ pickRPos }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Position perturbation<sc-if value="{{ isRPos }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
+      </div>
+      <button onClick="{{ restartR }}" style="cursor:pointer;background:transparent;border:1px solid rgba(27,25,23,.14);padding:8px 13px;font:400 11.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">↻ replay</button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;margin-bottom:14px;padding:13px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.13 250)">
+      <span style="flex:none;font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.45)">Instruction</span>
+      <sc-if value="{{ rc_t2_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t2_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the blue cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t2_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t4_id }}" hint-placeholder-val="{{ true }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t4_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it on the plate.”</span></sc-if>
+      <sc-if value="{{ rc_t4_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the pink bowl.”</span></sc-if>
+      <sc-if value="{{ rc_t6_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
+      <div style="border:1px solid rgba(27,25,23,.14);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.6)">GR00T-N1.6</span>
+          
+        </div>
+        <video ref="{{ refBaseR }}" src="{{ baseSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+      <div style="border:1.5px solid oklch(0.5 0.13 250 / 0.5);overflow:hidden;background:#fff">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
+          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">GR00T-N1.6 + Ours</span>
+          
+        </div>
+        <video ref="{{ refOursR }}" src="{{ oursSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
+      </div>
+    </div>
+    </div>
+
+  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
+      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em"><span style="letter-spacing: -0.012em;">Simulation Experiments- LIBERO &amp; LIBERO-PRO</span><br></h2>
       
     </div>
     <p style="margin:22px 0 0;font:400 17px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.82);text-wrap:pretty">We fine-tune two backbones, π<sub>0.5</sub> and GR00T-N1.6, on the same 69 pick-and-place tasks (LIBERO-Object, LIBERO-Spatial and 49 tasks from LIBERO-90), once as-is and once with our module. Every model is then tested under three conditions:</p>
@@ -347,11 +451,8 @@ img,video{max-width:100%}
   </sc-if>
 
   <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
-    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
-      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Rollouts in simulation</h2>
-      
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:22px 0 16px">
+    <h3 style="margin:0;font:400 clamp(19px,2.1vw,22px)/1.25 Newsreader,serif;letter-spacing:-.01em">Rollouts in simulation</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:18px 0 16px">
       <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
         <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Suite</span>
         <button onClick="{{ pickObj }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">LIBERO-Object<sc-if value="{{ isObj }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
@@ -393,110 +494,6 @@ img,video{max-width:100%}
     <p style="margin: 16px 0 0; font: 400 15.5px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.6); text-align: justify">Both panes always show the same two models: GR00T-N1.6 fine-tuned as-is, and with our module. Both succeed in distribution. Under task perturbation, the baseline ignores the new target and repeats the motion it memorized for this scene; under position perturbation, it reaches for where the target used to be. With our module, the policy follows the instruction and finds the moved object.</p>
 
   </div>
-
-  <div style="padding:clamp(38px,5vw,60px) clamp(20px,5vw,84px) 0">
-    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
-      <h2 style="margin:0;font:400 clamp(22px,2.6vw,28px)/1.2 Newsreader,serif;letter-spacing:-.012em">Real-world experiments</h2>
-      
-    </div>
-    <p style="margin: 22px 0 0; font: 400 17px/1.72 Newsreader,Georgia,serif; color: rgba(27,25,23,.82); text-wrap: pretty; font-size: 16px">In our real-world experiments, the 2D point comes from an off-the-shelf VLM (Qwen3-VL-4B) and depth from a consumer RGB-D camera (Intel RealSense D435); both are far noisier than the ground-truth signals available in simulation.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin:22px 0 16px">
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Scene</span>
-        <button onClick="{{ pickT4 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Lemon → bowl<sc-if value="{{ isT4 }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-        <button onClick="{{ pickT6 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Orange → green bowl<sc-if value="{{ isT6 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-        <button onClick="{{ pickT2 }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Red cube → bowl<sc-if value="{{ isT2 }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-        <span style="font:400 10px/1 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.4);margin-right:4px">Condition</span>
-        <button onClick="{{ pickRId }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">In distribution<sc-if value="{{ isRId }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-        <button onClick="{{ pickRTask }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Task perturbation<sc-if value="{{ isRTask }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-        <button onClick="{{ pickRPos }}" style="position:relative;cursor:pointer;background:#fff;border:1px solid rgba(27,25,23,.16);padding:8px 13px;font:500 12px/1 'IBM Plex Mono',monospace;color:#1b1917">Position perturbation<sc-if value="{{ isRPos }}"><div style="position:absolute;inset:-1px;border:1.5px solid oklch(0.5 0.13 250);pointer-events:none"></div></sc-if></button>
-      </div>
-      <button onClick="{{ restartR }}" style="cursor:pointer;background:transparent;border:1px solid rgba(27,25,23,.14);padding:8px 13px;font:400 11.5px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.55)">↻ replay</button>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;margin-bottom:14px;padding:13px 18px;background:#f2efe8;border-left:2px solid oklch(0.5 0.13 250)">
-      <span style="flex:none;font:500 10px/1.6 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.45)">Instruction</span>
-      <sc-if value="{{ rc_t2_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t2_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the blue cube and place it into the bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t2_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the red cube and place it into the bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t4_id }}" hint-placeholder-val="{{ true }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t4_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it on the plate.”</span></sc-if>
-      <sc-if value="{{ rc_t4_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the lemon and place it into the bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t6_id }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t6_task }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the pink bowl.”</span></sc-if>
-      <sc-if value="{{ rc_t6_pos }}"><span style="font:400 16px/1.55 Newsreader,Georgia,serif;color:rgba(27,25,23,.85)">“Pick up the orange and place it into the green bowl.”</span></sc-if>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
-      <div style="border:1px solid rgba(27,25,23,.14);overflow:hidden;background:#fff">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
-          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.6)">GR00T-N1.6</span>
-          
-        </div>
-        <video ref="{{ refBaseR }}" src="{{ baseSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
-      </div>
-      <div style="border:1.5px solid oklch(0.5 0.13 250 / 0.5);overflow:hidden;background:#fff">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(27,25,23,.1)">
-          <span style="font:500 12px/1 'IBM Plex Mono',monospace;color:oklch(0.42 0.13 250)">GR00T-N1.6 + Ours</span>
-          
-        </div>
-        <video ref="{{ refOursR }}" src="{{ oursSrcR }}" autoplay="" muted="muted" loop="loop" playsinline="" preload="metadata" style="width:100%;height:auto;display:block;background:#efece5"></video>
-      </div>
-    </div>
-    <div style="margin-top:30px;overflow-x:auto"><table style="width:100%;min-width:560px;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace">
-      <thead>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.2)">
-          <th style="width:37%;text-align:left;padding:0 8px 9px 0;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55)">Method</th>
-          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:rgba(27,25,23,.55);border-left:1px solid rgba(27,25,23,.1)">In distribution</th>
-          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Task perturbation</th>
-          <th style="width:21%;text-align:center;padding:0 8px 9px;font:500 10px/1.4 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:oklch(0.5 0.14 30);border-left:1px solid rgba(27,25,23,.1)">Position perturbation</th>
-        </tr>
-      </thead>
-      <tbody style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,25,23,.8)">
-        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled pairs — with vs. without our module</td></tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub></td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">85.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">32.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">27.5</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
-          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">π<sub>0.5</sub> + Ours</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">91.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">78.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">61.3</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">68.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">3.8</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07);background:#f2efe8">
-          <td style="padding:9px 8px 9px 0;font:500 13.5px/1.3 Newsreader,Georgia,serif">GR00T-N1.6 + Ours</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">92.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">63.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1);color:oklch(0.42 0.13 250)">66.3</td>
-        </tr>
-        <tr><td colspan="4" style="padding:16px 0 6px;font:500 9.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,25,23,.55)">Controlled comparison of representation and injection — GR00T-N1.6</td></tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Text Prompt</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">7.5</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via Visual Prompt</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">88.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">6.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 2D via AdaLN</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">87.5</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">18.8</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">16.3</td>
-        </tr>
-        <tr style="border-bottom:1px solid rgba(27,25,23,.07)">
-          <td style="padding:9px 8px 9px 0;font:400 13.5px/1.3 Newsreader,Georgia,serif">+ 3D via Text Prompt</td>
-          <td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">86.3</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td><td style="text-align:center;padding:9px 8px;border-left:1px solid rgba(27,25,23,.1)">5.0</td>
-        </tr>
-      </tbody>
-    </table></div>
-    
-    <ul style="margin:18px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px;font:400 15.5px/1.72 Newsreader,Georgia,serif;color:rgba(27,25,23,.72);text-wrap:pretty">
-      <li style="font-size: 16px">The simulation findings hold on a real robot, despite noisier grounding and depth.</li>
-      <li style="font-size: 16px">Both backbones collapse under perturbation and our module restores most of the performance.</li>
-      <li style="font-size: 16px">Every grounding variant helps in distribution, but only ours holds up under perturbation.&nbsp;</li>
-    </ul>
-  </div>
-
 
   <div style="padding:clamp(38px,5vw,56px) clamp(20px,5vw,84px) 60px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(27,25,23,.14)">
